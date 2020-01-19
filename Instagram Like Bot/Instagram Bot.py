@@ -42,8 +42,9 @@ class InstagramBot:
 
     def like_photo(self, name, no_of_pics_to_like):
         driver = self.driver
-        driver.get("https://www.instagram.com/" + name + "/")
         time.sleep(0.5)
+        driver.get("https://www.instagram.com/" + name + "/")
+        time.sleep(2)
 
         pic_hrefs = []
         while True:
@@ -116,14 +117,14 @@ class InstagramBot:
                         else:
                             continue
                     except:
-                        time.sleep(2)
+                        time.sleep(3)
 
         f.close()
 
 
 name = input("Enter Instagram Name to like photos on : ")
 no_of_pics_to_like = int(
-    input("Enter Number Of Recent Posts to Like : "))
+    input("Enter Number Of Posts to Like : "))
 file_name = name
 
 email = input("Enter Your Instagram ID : ")
