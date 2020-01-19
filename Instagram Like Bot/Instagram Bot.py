@@ -42,11 +42,12 @@ class InstagramBot:
 
     def like_photo(self, name, no_of_pics_to_like):
         driver = self.driver
-        time.sleep(0.5)
+        time.sleep(1)
         driver.get("https://www.instagram.com/" + name + "/")
-        time.sleep(2)
+        time.sleep(2.5)
 
         pic_hrefs = []
+        temp = []
         while True:
             try:
                 driver.execute_script(
@@ -60,6 +61,15 @@ class InstagramBot:
                 # building list of unique photos
                 [pic_hrefs.append(href)
                  for href in hrefs_in_view if href not in pic_hrefs]
+
+                temp.append(len(pic_hrefs))
+                length = len(temp)
+
+                if(length == 5):
+                    if(len(set(temp)) <= 1):
+                        break
+                    else:
+                        temp.clear()
 
                 if(len(pic_hrefs) >= no_of_pics_to_like):
                     break
@@ -92,8 +102,8 @@ class InstagramBot:
                     driver.find_element_by_xpath(
                         like_button_xpath).click()
                     no_of_likes += 1
-                    print(f"{no_of_likes}. {pic_href}")
-                    f.write(f"{no_of_likes}. {pic_href}\n")
+                    print(f"{no_of_likes}. Liked {pic_href}")
+                    f.write(f"{no_of_likes}. Liked {pic_href}\n")
                     if no_of_likes == no_of_pics_to_like:
                         print(
                             f"\n\nTOTAL NUMBER OF POSTS LIKED : {no_of_likes}\n")
@@ -102,6 +112,9 @@ class InstagramBot:
                         break
                     time.sleep(0.5)
                 else:
+                    no_of_likes += 1
+                    print(f"{no_of_likes}. Already liked {pic_href}")
+                    f.write(f"{no_of_likes}. Already liked {pic_href}\n")
                     continue
             except Exception as e:
                 while True:
@@ -110,11 +123,15 @@ class InstagramBot:
                             driver.find_element_by_xpath(
                                 like_button_xpath).click()
                             no_of_likes += 1
-                            print(f"{no_of_likes}. {pic_href}")
-                            f.write(f"{no_of_likes}. {pic_href}\n")
+                            print(f"{no_of_likes}. Liked {pic_href}")
+                            f.write(f"{no_of_likes}. Liked {pic_href}\n")
                             time.sleep(0.5)
                             break
                         else:
+                            no_of_likes += 1
+                            print(f"{no_of_likes}. Already liked {pic_href}")
+                            f.write(
+                                f"{no_of_likes}. Already liked {pic_href}\n")
                             continue
                     except:
                         time.sleep(3)
