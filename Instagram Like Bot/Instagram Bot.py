@@ -3,6 +3,7 @@ from selenium.webdriver.common.keys import Keys
 import time
 from math import ceil
 import os
+from getpass import getpass
 
 
 def clearFile():
@@ -121,7 +122,7 @@ no_of_pics_to_like = int(
 file_name = name
 
 email = input("Enter Your Instagram ID : ")
-password = input("Enter Your Instagram Password : ")
+password = getpass(prompt="Enter Your Instagram Password : ")
 
 i_love_coding_ = InstagramBot(email, password)
 i_love_coding_.login()
