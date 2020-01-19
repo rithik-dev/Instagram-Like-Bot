@@ -43,16 +43,10 @@ class InstagramBot:
     def like_photo(self, name, no_of_pics_to_like):
         driver = self.driver
         driver.get("https://www.instagram.com/" + name + "/")
-        time.sleep(1.5)
-
-        scroll_times = 10
-        if no_of_pics_to_like <= 24:
-            scroll_times = 2
-        else:
-            scroll_times = int(ceil(no_of_pics_to_like / 12))
+        time.sleep(0.5)
 
         pic_hrefs = []
-        for i in range(1, scroll_times):
+        while True:
             try:
                 driver.execute_script(
                     "window.scrollTo(0, document.body.scrollHeight);")
@@ -65,6 +59,9 @@ class InstagramBot:
                 # building list of unique photos
                 [pic_hrefs.append(href)
                  for href in hrefs_in_view if href not in pic_hrefs]
+
+                if(len(pic_hrefs) >= no_of_pics_to_like):
+                    break
 
             except Exception:
                 continue
@@ -82,34 +79,42 @@ class InstagramBot:
             f"Started Liking {no_of_pics_to_like} Posts on \'{name}\' :-\n\n")
 
         # liking photos
-
         for pic_href in pic_hrefs:
             driver.get(pic_href)
-            time.sleep(1.5)
-            driver.execute_script(
-                "window.scrollTo(0, document.body.scrollHeight);")
+            svg_aria_label = driver.find_element_by_tag_name(
+                "svg").get_attribute("aria-label")
+            like_button_xpath = '//button[@class="wpO6b "]'
+            time.sleep(0.5)
+
             try:
-                driver.find_element_by_xpath(
-                    '//button[@class="wpO6b "]').click()
-                no_of_likes += 1
-                print(f"{no_of_likes}. {pic_href}")
-                f.write(f"{no_of_likes}. {pic_href}\n")
-                if no_of_likes == no_of_pics_to_like:
-                    print(f"\n\nTOTAL NUMBER OF POSTS LIKED : {no_of_likes}\n")
-                    f.write(
-                        f"\n\nTOTAL NUMBER OF POSTS LIKED : {no_of_likes}\n")
-                    break
-                time.sleep(0.5)
+                if(svg_aria_label == "Like"):
+                    driver.find_element_by_xpath(
+                        like_button_xpath).click()
+                    no_of_likes += 1
+                    print(f"{no_of_likes}. {pic_href}")
+                    f.write(f"{no_of_likes}. {pic_href}\n")
+                    if no_of_likes == no_of_pics_to_like:
+                        print(
+                            f"\n\nTOTAL NUMBER OF POSTS LIKED : {no_of_likes}\n")
+                        f.write(
+                            f"\n\nTOTAL NUMBER OF POSTS LIKED : {no_of_likes}\n")
+                        break
+                    time.sleep(0.5)
+                else:
+                    continue
             except Exception as e:
                 while True:
                     try:
-                        driver.find_element_by_xpath(
-                            '//button[@class="wpO6b "]').click()
-                        no_of_likes += 1
-                        print(f"{no_of_likes}. {pic_href}")
-                        f.write(f"{no_of_likes}. {pic_href}\n")
-                        time.sleep(0.5)
-                        break
+                        if(svg_aria_label == "Like"):
+                            driver.find_element_by_xpath(
+                                like_button_xpath).click()
+                            no_of_likes += 1
+                            print(f"{no_of_likes}. {pic_href}")
+                            f.write(f"{no_of_likes}. {pic_href}\n")
+                            time.sleep(0.5)
+                            break
+                        else:
+                            continue
                     except:
                         time.sleep(2)
 
