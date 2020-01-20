@@ -89,6 +89,11 @@ class InstagramBot:
         f.write(
             f"Started Liking {no_of_pics_to_like} Posts on \'{name}\' :-\n\n")
 
+        try:
+            pic_hrefs = pic_hrefs[:no_of_pics_to_like]
+        except Exception:
+            pass
+
         # liking photos
         for pic_href in pic_hrefs:
             driver.get(pic_href)
@@ -97,44 +102,35 @@ class InstagramBot:
             like_button_xpath = '//button[@class="wpO6b "]'
             time.sleep(0.5)
 
-            try:
-                if(svg_aria_label == "Like"):
-                    driver.find_element_by_xpath(
-                        like_button_xpath).click()
-                    no_of_likes += 1
-                    print(f"{no_of_likes}. Liked {pic_href}")
-                    f.write(f"{no_of_likes}. Liked {pic_href}\n")
-                    if no_of_likes == no_of_pics_to_like:
-                        print(
-                            f"\n\nTOTAL NUMBER OF POSTS LIKED : {no_of_likes}\n")
-                        f.write(
-                            f"\n\nTOTAL NUMBER OF POSTS LIKED : {no_of_likes}\n")
-                        break
-                    time.sleep(0.5)
-                else:
-                    no_of_likes += 1
-                    print(f"{no_of_likes}. Already liked {pic_href}")
-                    f.write(f"{no_of_likes}. Already liked {pic_href}\n")
+            msg = ''
+            post_liked = False
+
+            while not post_liked:
+                try:
+                    if(svg_aria_label == "Like"):
+                        driver.find_element_by_xpath(like_button_xpath).click()
+
+                        no_of_likes += 1
+
+                        msg = f"{no_of_likes}. Liked {pic_href}"
+                        post_liked = True
+                        time.sleep(0.5)
+                    else:
+                        no_of_likes += 1
+                        post_liked = True
+                        msg = f"{no_of_likes}. Already liked {pic_href}"
+                        time.sleep(0.5)
+                except Exception as e:
+                    time.sleep(2)
                     continue
-            except Exception as e:
-                while True:
-                    try:
-                        if(svg_aria_label == "Like"):
-                            driver.find_element_by_xpath(
-                                like_button_xpath).click()
-                            no_of_likes += 1
-                            print(f"{no_of_likes}. Liked {pic_href}")
-                            f.write(f"{no_of_likes}. Liked {pic_href}\n")
-                            time.sleep(0.5)
-                            break
-                        else:
-                            no_of_likes += 1
-                            print(f"{no_of_likes}. Already liked {pic_href}")
-                            f.write(
-                                f"{no_of_likes}. Already liked {pic_href}\n")
-                            continue
-                    except:
-                        time.sleep(3)
+
+                if(post_liked):
+                    print(msg)
+                    f.write(msg + "\n")
+                    break
+
+        print(f"\n\nTOTAL NUMBER OF POSTS LIKED : {no_of_likes}\n")
+        f.write(f"\n\nTOTAL NUMBER OF POSTS LIKED : {no_of_likes}\n")
 
         f.close()
 
@@ -147,7 +143,7 @@ file_name = name
 email = input("Enter Your Instagram ID : ")
 password = getpass(prompt="Enter Your Instagram Password : ")
 
-i_love_coding_ = InstagramBot(email, password)
-i_love_coding_.login()
-i_love_coding_.like_photo(name, no_of_pics_to_like)
-i_love_coding_.closeBrowser()
+BOT = InstagramBot(email, password)
+BOT.login()
+BOT.like_photo(name, no_of_pics_to_like)
+BOT.closeBrowser()
